@@ -27,25 +27,23 @@ df %>%
   mutate(Colour=replace(Colour, Colour=="purpal", "purple")) -> df
 # capitalize first letter
 df %>%
-  mutate(Colour=replace(Colour, Colour=="purple", "Purple")) -> df
-df %>%
-  mutate(Colour=replace(Colour, Colour=="red", "Red")) -> df
-df %>%
-  mutate(Colour=replace(Colour, Colour=="blue", "Blue")) -> df
-df %>%
+  mutate(Colour=replace(Colour, Colour=="purple", "Purple")) %>%
+  mutate(Colour=replace(Colour, Colour=="red", "Red")) %>%
+  mutate(Colour=replace(Colour, Colour=="blue", "Blue")) %>%
   mutate(Colour=replace(Colour, Colour=="green", "Green")) -> df
 # Count nb part per Colours
 table(df$Colour)
 # nb of rows
 N = nrow(df)
-# Count pass
-table(df$pass)
 # group by colour
 by_colour <- group_by(df,Colour)
+by_colour %>%  summarise(nb_part = n()) %>% select(Colour,nb_part) -> df_nb_part
 # group by colour and by pass
 by_colour_pass <- group_by(df,Colour,pass)
 # number of parts
-by_colour_pass %>% filter(pass==TRUE) %>% summarise(n = 100*n()/N)
+by_colour_pass %>% filter(pass==TRUE) %>% summarise(n = 100*n()/N) %>% select(Colour,n)-> df_percent_pass
 # mean length
-by_colour %>% summarise(mean = mean(Vals),var = var(Vals))
+by_colour %>% summarise(mean = mean(Vals),var = var(Vals)) -> df_mean_var
+
+write.csv(df_mean_var, file = "result.csv")
 
