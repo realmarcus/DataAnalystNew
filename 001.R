@@ -1,7 +1,6 @@
 #libraries
 library("dplyr")
 library("Hmisc")
-library("ggplot2")
 # import data
 data <- read.csv("./data/data-15aa4675580.csv")
 # create data frame
@@ -13,7 +12,8 @@ str(df)
 #mutate(df,col = capitalize(as.character(Colour)))
 df %>% mutate_if(is.factor, as.character) -> df
 # to lower case 
-df <- mutate_each(df, funs(tolower))
+#df <- mutate_each(df, funs(tolower))
+df <- mutate(df,Colour = tolower(Colour))
 # pass
 df %>% mutate(pass = (Vals<=14)&(Vals>=13)) -> df
 #df$Colour <- as.factor(df$Colour)
@@ -25,11 +25,27 @@ df %>% arrange(Colour,pass) -> df
 # solve typo "purpal"
 df %>%
   mutate(Colour=replace(Colour, Colour=="purpal", "purple")) -> df
-# Count Colours
+# capitalize first letter
+df %>%
+  mutate(Colour=replace(Colour, Colour=="purple", "Purple")) -> df
+df %>%
+  mutate(Colour=replace(Colour, Colour=="red", "Red")) -> df
+df %>%
+  mutate(Colour=replace(Colour, Colour=="blue", "Blue")) -> df
+df %>%
+  mutate(Colour=replace(Colour, Colour=="green", "Green")) -> df
+# Count nb part per Colours
 table(df$Colour)
+# nb of rows
+N = nrow(df)
+# Count pass
+table(df$pass)
 # group by colour
-#by_colour <- group_by(df,Colour)
+by_colour <- group_by(df,Colour)
+# group by colour and by pass
+by_colour_pass <- group_by(df,Colour,pass)
 # number of parts
-#summarise(by_colour,n())
-#change purpal into purple
-#mutate(df, Colour = ifelse(grepl("purpal", Colour), "Purple","tata"))
+by_colour_pass %>% filter(pass==TRUE) %>% summarise(n = 100*n()/N)
+# mean length
+by_colour %>% summarise(mean = mean(Vals),var = var(Vals))
+
